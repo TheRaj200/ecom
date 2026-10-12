@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useStore } from './ContextStore';
 
 // 4 Curated Products
 const PRODUCTS = [
@@ -56,11 +57,12 @@ const PRODUCTS = [
   }
 ];
 
-const ProductSection = ({ onAddToCart }) => {
+const ProductSection = () => {
+  const { addToCart } = useStore();
   const [addedId, setAddedId] = useState(null);
 
   const handleAdd = (product) => {
-    onAddToCart(product);
+    addToCart(product);
     setAddedId(product.id);
     setTimeout(() => {
       setAddedId(null);

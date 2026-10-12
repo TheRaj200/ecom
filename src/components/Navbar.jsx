@@ -1,7 +1,8 @@
 import React from 'react';
+import { useStore } from './ContextStore';
 
-const Navbar = ({ cart, onOpenCart }) => {
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+const Navbar = () => {
+  const { totalItems, setIsCartOpen } = useStore();
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
@@ -36,7 +37,7 @@ const Navbar = ({ cart, onOpenCart }) => {
           {/* Action Buttons: Cart Button */}
           <div className="flex items-center gap-3">
             <button
-              onClick={onOpenCart}
+              onClick={() => setIsCartOpen(true)}
               type="button"
               className="relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gray-900 text-white hover:bg-indigo-600 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-indigo-200 cursor-pointer"
               aria-label="Shopping Cart"

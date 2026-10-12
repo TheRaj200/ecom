@@ -1,97 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Navbar from './components/Navbar';
 import ProductSection from './components/ProductSection';
 import Footer from './components/Footer';
+import { useStore } from './components/ContextStore';
 
 function App() {
-  // Cart state persisted with localStorage
-  const [cart, setCart] = useState(() => {
-    try {
-      const savedCart = localStorage.getItem('cart');
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch (error) {
-      console.error('Error reading cart from localStorage:', error);
-      return [];
-    }
-  });
-
-  // Slide-over cart drawer visibility
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Toast notification state
-  const [toastMessage, setToastMessage] = useState(null);
-
-  // Sync cart to localStorage whenever it changes
-  useEffect(() => {
-    try {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
-    }
-  }, [cart]);
-
-  // Add product to cart handler
-  const handleAddToCart = (product) => {
-    setCart((prevCart) => {
-      const existingItemIndex = prevCart.findIndex((item) => item.id === product.id);
-
-      if (existingItemIndex > -1) {
-        // Increment quantity
-        const updated = [...prevCart];
-        updated[existingItemIndex] = {
-          ...updated[existingItemIndex],
-          quantity: (updated[existingItemIndex].quantity || 1) + 1,
-        };
-        return updated;
-      } else {
-        // Add new product with initial quantity 1
-        return [...prevCart, { ...product, quantity: 1 }];
-      }
-    });
-
-    // Show temporary toast notification
-    setToastMessage(`"${product.title.slice(0, 24)}..." added to cart!`);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 2500);
-  };
-
-  // Quantity updates
-  const updateQuantity = (productId, delta) => {
-    setCart((prevCart) =>
-      prevCart
-        .map((item) => {
-          if (item.id === productId) {
-            const newQty = (item.quantity || 1) + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean)
-    );
-  };
-
-  // Remove single item
-  const removeFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
-  };
-
-  // Clear entire cart
-  const clearCart = () => {
-    setCart([]);
-  };
-
-  // Total cart price calculation
-  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    subtotal,
+    isCartOpen,
+    setIsCartOpen,
+    toastMessage,
+  } = useStore();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-gray-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
       
-      {/* 1. Navbar Component */}
-      <Navbar
-        cart={cart}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
+      {/* 1. Navbar Component (uses Context) */}
+      <Navbar />
 
       {/* Hero Announcement Banner */}
       <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-600 text-white text-xs sm:text-sm font-medium py-2.5 px-4 text-center">
@@ -142,9 +71,9 @@ function App() {
         </div>
       </section>
 
-      {/* 2. Product Section Component */}
+      {/* 2. Product Section Component (uses Context) */}
       <main className="flex-1">
-        <ProductSection onAddToCart={handleAddToCart} />
+        <ProductSection />
       </main>
 
       {/* 3. Footer Component */}
